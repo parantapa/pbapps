@@ -1,0 +1,3 @@
+[submodule "external/pypb"]
+	path = external/pypb
+	url = github:parantapa/pypb
