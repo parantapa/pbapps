@@ -6,5 +6,7 @@ if [[ -r "$srcdir/venv/bin/activate" ]] ; then
     source "$srcdir/venv/bin/activate"
 fi
 
+source "$HOME/.bashrc"
+
 export UID
 exec python mute-on-screensaver.py
