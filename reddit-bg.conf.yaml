@@ -23,5 +23,5 @@ savedir: /var/tmp/pbapps/reddit-bg/images/
 seen-urls-file: /var/tmp/pbapps/reddit-bg/seen-urls.json
 logfile: /var/tmp/pbapps/reddit-bg/reddit-bg.log
 
-pidfile: /run/user/$UID/pbapps/i3status/external/50-reddit-bg.pid
-statefile: /run/user/$UID/pbapps/i3status/external/50-reddit-bg.block
+pidfile: /run/user/$UID/pbapps/i3status/external/50reddit-bg.pid
+statefile: /run/user/$UID/pbapps/i3status/external/50reddit-bg.block
