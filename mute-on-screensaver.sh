@@ -9,4 +9,4 @@ fi
 source "$HOME/.bashrc"
 
 export UID
-exec python mute-on-screensaver.py
+exec python "$srcdir/mute-on-screensaver.py"
