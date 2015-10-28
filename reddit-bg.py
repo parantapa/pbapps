@@ -67,7 +67,7 @@ def state_update(text, fname):
 
     block = {
         "full_text": "{}: {}".format(SYMB_REDDIT, text),
-        "color": "#55ff55"
+        "color": "#66d9ef"
     }
 
     with aw.copen(fname, "w", "utf-8") as fobj:

@@ -17,10 +17,10 @@ import subprocess as sub
 import psutil
 import pypb.awriter as aw
 
-C_GREY = "#999999"
-C_WHITE = "#ffffff"
-C_RED = "#ff5555"
-C_GREEN = "#55ff55"
+C_GREY = "#7e8e91"
+C_WHITE = "#f8f8f2"
+C_RED = "#f92672"
+C_GREEN = "#a6e22e"
 
 SYMB_MEMORY = "\uf1c0"
 SYMB_CPU = "\uf108"

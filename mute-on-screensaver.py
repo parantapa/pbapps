@@ -13,7 +13,7 @@ from subprocess import Popen, PIPE, STDOUT
 import pypb.awriter as aw
 
 SYMB_MUTE_ON_SCREENSAVER = "\uf1b3"
-C_GREEN = "#55ff55"
+C_GREEN = "#fd971f"
 
 def do_main():
     """
