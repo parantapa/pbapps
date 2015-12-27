@@ -111,7 +111,7 @@ def main():
     extdir = extdir.format(uid)
 
     # Get alarm time
-    period = show_entry_dialog("Alarm", "Enter time period", "20m")
+    period = show_entry_dialog("Alarm", "Enter time period", "25m")
     try:
         period = parse_period(period)
     except ValueError as e:
@@ -152,7 +152,7 @@ def main():
         time.sleep(2)
         now = arrow.now().timestamp
 
-    show_notificaiton("normal", 0, "Time up", "%s finished" % name)
+    show_notificaiton("critical", 0, "Time up", "%s finished" % name)
 
 if __name__ == '__main__':
     main()
