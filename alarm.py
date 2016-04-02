@@ -17,6 +17,7 @@ import arrow
 
 import pypb.awriter as aw
 from pypb.dmn_misc import dmn_pid
+from pbapps_common import get_i3status_rundir
 
 C_WHITE = "#f8f8f2"
 
@@ -105,10 +106,7 @@ def fmt_period(period):
 
 def main():
     # Create the external state directory
-    uid = os.environ["UID"]
-    uid = int(uid)
-    extdir = "/run/user/{}/pbapps/i3status/external"
-    extdir = extdir.format(uid)
+    extdir = get_i3status_rundir()
 
     # Get alarm time
     period = show_entry_dialog("Alarm", "Enter time period", "25m")

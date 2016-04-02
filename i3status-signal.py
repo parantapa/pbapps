@@ -14,13 +14,11 @@ import signal
 from subprocess import Popen, PIPE
 
 from i3status import get_pids
+from pbapps_common import get_i3status_rundir
 
 def main():
     # Create the external state directory
-    uid = os.environ["UID"]
-    uid = int(uid)
-    extdir = "/run/user/{}/pbapps/i3status/external"
-    extdir = extdir.format(uid)
+    extdir = get_i3status_rundir()
 
     # Get the service pids
     service_pids = get_pids(extdir)
