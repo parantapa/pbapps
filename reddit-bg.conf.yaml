@@ -1,6 +1,4 @@
-nitrogen-bg-conf: ~/.config/nitrogen/bg-saved.cfg
-
-wallpaper-subs:
+wallpaper_subreddits:
     - earthporn
     - waterporn
     - seaporn
@@ -11,18 +9,15 @@ wallpaper-subs:
     - sushi
     - ramen
     - incredibleindia
-    - VillagePorn
+    - villageporn
 
-user-agent: Wallpaper Downloader by /u/obsadim4g
+user_agent: Wallpaper Downloader by /u/obsadim4g
 
 screens:
     - [screen1, auto]
 
-update-interval: 15
+update_interval: 15
 
-savedir: /var/tmp/pbapps/reddit-bg/images/
-seen-urls-file: /var/tmp/pbapps/reddit-bg/seen-urls.json
-logfile: /var/tmp/pbapps/reddit-bg/reddit-bg.log
-
-pidfile: /run/user/$UID/pbapps/i3status/external/50reddit-bg.pid
-statefile: /run/user/$UID/pbapps/i3status/external/50reddit-bg.block
+save_dir: /var/tmp/pbapps/reddit-bg/images/
+seenurls_fname: /var/tmp/pbapps/reddit-bg/seen-urls.json
+nitrogen_conf_fname: ~/.config/nitrogen/bg-saved.cfg

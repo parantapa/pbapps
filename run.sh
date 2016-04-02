@@ -7,8 +7,7 @@ if [[ -r "$srcdir/venv/bin/activate" ]] ; then
 fi
 
 source "$HOME/.bashrc"
+export UID
 
 script="$1"
-
-export UID
 exec python "${srcdir}/${script}.py"

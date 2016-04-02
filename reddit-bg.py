@@ -9,23 +9,29 @@ from __future__ import division, print_function, unicode_literals
 __author__ = "Parantapa Bhattachara <pb [at] parantapa [dot] net>"
 
 import os
+from os.path import join, isdir, isfile
 import sys
 import time
 import json
-import codecs
 import random
-import hashlib
-from os.path import join, isdir, isfile
 import signal
+import hashlib
 from ConfigParser import ConfigParser
 from subprocess import call, check_output, CalledProcessError
-from pipes import quote as shell_quote
 
-import requests
 import yaml
 import logbook
+import requests
+
 from pypb import abspath
 import pypb.awriter as aw
+from pypb import register_exit_signals
+
+from pbapps_common import get_i3status_rundir, \
+                          get_logdir, \
+                          dummy_handler
+
+MODULE = "reddit-bg"
 
 IMAGE_EXTS = "jpg JPG jpeg JPEG png PNG".split()
 
@@ -34,17 +40,12 @@ SYMB_SLEEPING = "\uf236"
 SYMB_GET_IMG_LIST = "\uf021"
 SYMB_DOWNLOAD_IMG = "\uf019"
 
-def _dummy_handler(_, __): # pylint: disable=unused-argument
-    """
-    Pass; do nothing
-    """
+log = logbook.Logger(MODULE)
 
-def _term_handler(signum, _):
-    """
-    Raise SystemExit.
-    """
-
-    raise SystemExit("Received Signal {} !".format(signum))
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
 
 def _req_get(*args, **kwargs):
     """
@@ -65,12 +66,12 @@ def state_update(text, fname):
     Write text to file atomically. Text may contain unicode.
     """
 
-    block = {
+    block = [{
         "full_text": "{}: {}".format(SYMB_REDDIT, text),
         "color": "#66d9ef"
-    }
+    }]
 
-    with aw.copen(fname, "w", "utf-8") as fobj:
+    with aw.open(fname, "w") as fobj:
         json.dump(block, fobj)
 
 def _not_over_18(post):
@@ -141,9 +142,9 @@ def _is_image_file(fname):
     if not isfile(fname):
         return False
 
-    cmd = "file %s" % shell_quote(fname)
+    cmd = ["file", fname]
     try:
-        out = check_output(cmd, shell=True)
+        out = check_output(cmd)
     except CalledProcessError:
         return False
 
@@ -195,13 +196,13 @@ def download_image(url, fname):
     log.warn("Downloading failed!")
     return False
 
-def set_nitrogen_bg(cfname, screen, fname, mode="auto", bgcolor=None):
+def set_nitrogen_bg(cfname, screen, ifname, mode="auto", bgcolor=None):
     """
     Set the nitrogen background image.
 
     cfname  - Location for nitrogen's configuration
     screen  - Where to set the wall paper: fullscreen, screen1, screen2
-    fname   - Image fname to use as background image
+    ifname  - Image fname to use as background image
     mode    - scaled, auto, centered
     bgcolor - Background color for the desktop
     """
@@ -228,7 +229,7 @@ def set_nitrogen_bg(cfname, screen, fname, mode="auto", bgcolor=None):
     conf.read(cfname)
 
     # Fix in the stuff to fill in
-    conf.set(screen, "file", fname)
+    conf.set(screen, "file", ifname)
     conf.set(screen, "mode", mode)
     if bgcolor is not None:
         conf.set(screen, "bgcolor", bgcolor)
@@ -238,26 +239,26 @@ def set_nitrogen_bg(cfname, screen, fname, mode="auto", bgcolor=None):
         conf.write(fobj)
 
     # Call nitrogen restore to update
-    call("nitrogen --restore", shell=True)
+    call(["nitrogen", "--restore"])
 
-def set_background(screen, mode, cfg):
+def set_background(screen, mode, cfg, statefile):
     """
     Try to set the desktop background.
     """
 
     # Location of the state file
     log.info("Getting image list ...")
-    state_update(SYMB_GET_IMG_LIST, cfg["statefile"])
+    state_update(SYMB_GET_IMG_LIST, statefile)
     urls = []
-    for sub in cfg["wallpaper-subs"]:
-        us = get_subreddit_images(sub, cfg["user-agent"])
+    for sub in cfg.wallpaper_subreddits:
+        us = get_subreddit_images(sub, cfg.user_agent)
         urls.extend(us)
     urls = set(urls)
 
     # Load seen urls file
     log.info("Checking which urls have already been seen ...")
-    if isfile(cfg["seen-urls-file"]):
-        with open(cfg["seen-urls-file"]) as fobj:
+    if isfile(cfg.seenurls_fname):
+        with open(cfg.seenurls_fname) as fobj:
             seen_urls = set(json.load(fobj))
     else:
         seen_urls = set()
@@ -275,91 +276,97 @@ def set_background(screen, mode, cfg):
         # Create a unique filename for the url
         uhash = hashlib.sha1(url.encode("utf-8")).hexdigest()
         fname = "%s.%s" % (uhash, _getext(url))
-        fname = join(cfg["savedir"], fname)
+        fname = join(cfg.save_dir, fname)
 
         # Download the image
-        state_update(SYMB_DOWNLOAD_IMG, cfg["statefile"])
+        state_update(SYMB_DOWNLOAD_IMG, statefile)
         if not download_image(url, fname):
             continue
         if not _is_image_file(fname):
             continue
 
         # Set background
-        set_nitrogen_bg(cfg["nitrogen-bg-conf"], screen, fname, mode)
+        set_nitrogen_bg(cfg.nitrogen_conf_fname, screen, fname, mode)
         break
 
     # Dump updated seen urls
     log.info("Writing down list of checked urls ...")
-    with aw.open(cfg["seen-urls-file"], "w") as fobj:
+    with aw.open(cfg.seenurls_fname, "w") as fobj:
         json.dump(sorted(seen_urls), fobj)
 
-FNAME_KEYS = [
-    "nitrogen-bg-conf",
-    "savedir",
-    "seen-urls-file",
-    "pidfile",
-    "statefile",
-    "logfile"
-]
+def read_cfg(fname):
+    # pylint: disable=attribute-defined-outside-init,no-member
+    """
+    Read the config.
+    """
 
-def main():
+    with open(fname, "r") as fobj:
+        cfg = yaml.load(fobj)
+    cfg = AttrDict(cfg)
+
+    cfg.save_dir = abspath(cfg.save_dir)
+    cfg.seenurls_fname = abspath(cfg.seenurls_fname)
+    cfg.nitrogen_conf_fname = abspath(cfg.nitrogen_conf_fname)
+
+    return cfg
+
+def do_main(statefile):
+    # pylint: disable=no-member
+    """
+    Run the actual code.
+    """
+
     try:
         _, cfname = sys.argv # pylint: disable=unbalanced-tuple-unpacking
     except ValueError:
         print("Usage: ./reddit-bg.py <config.yaml>")
-        sys.exit(0)
-
+        sys.exit(1)
     cfname = abspath(cfname)
 
     # Load config
-    with open(cfname, "r") as fobj:
-        cfg = yaml.load(fobj)
-    for key in FNAME_KEYS:
-        cfg[key] = abspath(cfg[key])
+    cfg = read_cfg(cfname)
 
     # Create the savedir if not exists
-    if not isdir(cfg["savedir"]):
-        log.info("Creating image saving directory {} ...", cfg["savedir"])
-        os.makedirs(cfg["savedir"], 0o700)
-
-    # Write pid to pidfile
-    pid = str(os.getpid())
-    log.info("Writing pid ({}) to {} ...", pid, cfg["pidfile"])
-    with aw.open(cfg["pidfile"], "w") as fobj:
-        fobj.write(pid)
-
-    # Redirect stdout
-    log.info("Redecting output to {} ...", cfg["logfile"])
-    loghdl = logbook.FileHandler(cfg["logfile"])
-    loghdl.push_application()
-
-    # Setup the signal handlers
-    signal.signal(signal.SIGUSR1, _dummy_handler)
-    signal.signal(signal.SIGUSR2, _term_handler)
-    signal.signal(signal.SIGTERM, _term_handler)
-    signal.signal(signal.SIGINT, _term_handler)
-    signal.signal(signal.SIGQUIT, _term_handler)
+    if not isdir(cfg.save_dir):
+        log.info("Creating image saving directory {} ...", cfg.save_dir)
+        os.makedirs(cfg.save_dir, 0o700)
 
     while True:
         # Reload config
-        with open(cfname, "r") as fobj:
-            cfg = yaml.load(fobj)
-        for key in FNAME_KEYS:
-            cfg[key] = abspath(cfg[key])
+        cfg = read_cfg(cfname)
 
         # Try to get set background
-        for screen, mode in cfg["screens"]:
-            set_background(screen, mode, cfg)
+        for screen, mode in cfg.screens:
+            set_background(screen, mode, cfg, statefile)
 
         # Go to sleep
-        log.info("Next update after {} minutes.", cfg["update-interval"])
-        state_update(SYMB_SLEEPING, cfg["statefile"])
-        time.sleep(cfg["update-interval"] * 60)
+        log.info("Next update after {} minutes.", cfg.update_interval)
+        state_update(SYMB_SLEEPING, statefile)
+        time.sleep(cfg.update_interval * 60)
+
+def main():
+    prio = 30
+
+    # Setup logfile
+    logfile = "%s/%s.log" % (get_logdir(), MODULE)
+    logbook.FileHandler(logfile).push_application()
+
+    with log.catch_exceptions():
+        # Get the external state directory
+        extdir = get_i3status_rundir()
+
+        # Write out my own pid
+        pidfile = "%s/%d%s.pid" % (extdir, prio, MODULE)
+        with open(pidfile, "w") as fobj:
+            fobj.write(str(os.getpid()))
+
+        register_exit_signals()
+        signal.signal(signal.SIGUSR1, dummy_handler)
+
+        # File to write block info
+        blockfile = "%s/%d%s.block" % (extdir, prio, MODULE)
+
+        do_main(blockfile)
 
 if __name__ == '__main__':
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
-
-    log = logbook.Logger("reddit-bg")
-    logbook.StderrHandler().push_application()
-    with log.catch_exceptions():
-        main()
+    main()
