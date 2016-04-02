@@ -17,6 +17,16 @@ import codecs
 from select import select
 import signal
 
+import logbook
+from pypb import register_exit_signals
+
+from pbapps_common import get_i3status_rundir, \
+                          get_rundir, \
+                          get_logdir, \
+                          dummy_handler
+
+log = logbook.Logger("i3status")
+
 def read():
     """
     Read a single JSON encoded line.
@@ -52,11 +62,6 @@ def write(obj, hdr=False):
 
     print("," + json.dumps(obj))
     sys.stdout.flush()
-
-def dummy_handler(signum, frame): # pylint: disable=unused-argument
-    """
-    Dummy signal handler.
-    """
 
 def get_pids(extdir):
     """
@@ -140,37 +145,37 @@ def read_blocks(extdir):
     return ret
 
 def main():
-    # Make stdin and stdout UTF-8
-    sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
-    sys.stdin = codecs.getreader("utf-8")(sys.stdin)
+    # Setup logfile
+    logfile = get_logdir() + "/i3status.log"
+    logbook.FileHandler(logfile).push_application()
 
-    # Create the external state directory
-    uid = os.environ["UID"]
-    uid = int(uid)
-    extdir = "/run/user/{}/pbapps/i3status/external"
-    extdir = extdir.format(uid)
-    if not os.path.exists(extdir):
-        os.makedirs(extdir, 0o700)
+    with log.catch_exceptions():
+        # Write out my own pid
+        pidfile = get_rundir() + "/i3status.pid"
+        with open(pidfile, "w") as fobj:
+            fobj.write(str(os.getpid()))
 
-    # Write out my own pid
-    pidfile = "/run/user/{}/pbapps/i3status/i3status.pid"
-    pidfile = pidfile.format(uid)
-    with open(pidfile, "w") as fobj:
-        fobj.write(str(os.getpid()))
+        # Get the external state directory
+        extdir = get_i3status_rundir()
 
-    # Setup dummy signal handler on SIGUSR1
-    # Useful for waking up from sleep
-    signal.signal(signal.SIGUSR1, dummy_handler)
+        # Make stdin and stdout UTF-8
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
+        sys.stdin = codecs.getreader("utf-8")(sys.stdin)
 
-    # Write out the header
-    write({"version": 1, "click_events": True}, True)
-    write(None)
+        # Setup dummy signal handler on SIGUSR1
+        # Useful for waking up from sleep
+        register_exit_signals()
+        signal.signal(signal.SIGUSR1, dummy_handler)
 
-    while True:
-        # We ignore the input
-        _ = read()
-        write(read_blocks(extdir))
-        time.sleep(1)
+        # Write out the header
+        write({"version": 1, "click_events": True}, True)
+        write(None)
+
+        while True:
+            # We ignore the input
+            _ = read()
+            write(read_blocks(extdir))
+            time.sleep(1)
 
 if __name__ == '__main__':
     main()

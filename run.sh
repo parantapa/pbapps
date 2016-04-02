@@ -6,5 +6,9 @@ if [[ -r "$srcdir/venv/bin/activate" ]] ; then
     source "$srcdir/venv/bin/activate"
 fi
 
+source "$HOME/.bashrc"
+
+script="$1"
+
 export UID
-exec python "$srcdir/i3status.py"
+exec python "${srcdir}/${script}.py"
