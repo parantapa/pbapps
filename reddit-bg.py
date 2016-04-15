@@ -171,11 +171,14 @@ def get_subreddit_images(subreddit, user_agent):
         log.warn("Getting pics from /r/{} failed!", subreddit)
         return []
 
-    posts = posts.json()["data"]["children"]
-    posts = filter(_not_over_18, posts)
-    urls  = map(_getimg, posts)
-    urls  = map(_transform_imgur, urls)
-    urls  = filter(_is_image_url, urls)
+    try:
+        posts = posts.json()["data"]["children"]
+        posts = filter(_not_over_18, posts)
+        urls  = map(_getimg, posts)
+        urls  = map(_transform_imgur, urls)
+        urls  = filter(_is_image_url, urls)
+    except (ValueError, KeyError):
+        return []
 
     return list(urls)
 
