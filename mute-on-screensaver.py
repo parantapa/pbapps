@@ -41,7 +41,7 @@ def do_main():
             Popen(cmd).wait()
 
 def main():
-    prio = 20
+    prio = 70
 
     # Setup logfile
     logfile = "%s/%s.log" % (get_logdir(), MODULE)

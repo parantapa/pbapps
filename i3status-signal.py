@@ -21,7 +21,7 @@ def main():
     extdir = get_i3status_rundir()
 
     # Get the service pids
-    service_pids = get_pids(extdir)
+    service_pids = sorted(get_pids(extdir))
 
     # If we dont have any active services then exit
     if not service_pids:
