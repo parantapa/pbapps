@@ -17,7 +17,7 @@ import arrow
 
 import pypb.awriter as aw
 from pypb.dmn_misc import dmn_pid
-from pbapps_common import get_i3status_rundir
+from pbapps_common import get_i3status_rundir, wake_i3status
 
 C_WHITE = "#f8f8f2"
 
@@ -146,6 +146,7 @@ def main():
                 "full_text": full_text,
                 "color": C_WHITE
             }))
+        wake_i3status()
 
         time.sleep(2)
         now = arrow.now().timestamp

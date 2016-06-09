@@ -14,7 +14,7 @@ import json
 import glob
 import time
 import codecs
-from select import select
+from select import select, error as SelectError
 import signal
 
 import logbook
@@ -32,8 +32,11 @@ def read():
     Read a single JSON encoded line.
     """
 
-    rl, _, _ = select([sys.stdin], [], [], 1.0)
-    if not rl:
+    try:
+        rl, _, _ = select([sys.stdin], [], [], 1.0)
+        if not rl:
+            return None
+    except SelectError:
         return None
 
     inp = raw_input().strip()
@@ -175,7 +178,7 @@ def main():
             # We ignore the input
             _ = read()
             write(read_blocks(extdir))
-            time.sleep(1)
+            time.sleep(5)
 
 if __name__ == '__main__':
     main()

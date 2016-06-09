@@ -29,7 +29,8 @@ from pypb import register_exit_signals
 
 from pbapps_common import get_i3status_rundir, \
                           get_logdir, \
-                          dummy_handler
+                          dummy_handler, \
+                          wake_i3status
 
 MODULE = "reddit-bg"
 
@@ -73,6 +74,7 @@ def state_update(text, fname):
 
     with aw.open(fname, "w") as fobj:
         json.dump(block, fobj)
+    wake_i3status()
 
 def _not_over_18(post):
     """

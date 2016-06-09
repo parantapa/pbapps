@@ -15,7 +15,9 @@ import logbook
 import pypb.awriter as aw
 from pypb import register_exit_signals
 from pbapps_common import get_i3status_rundir, \
-                          get_logdir
+                          get_logdir, \
+                          wake_i3status
+
 
 SYMB_MUTE_ON_SCREENSAVER = "\uf026 \uf00d"
 C_ORANGE = "#fd971f"
@@ -69,6 +71,7 @@ def main():
                 "full_text": SYMB_MUTE_ON_SCREENSAVER,
                 "color": C_ORANGE
             }))
+        wake_i3status()
 
         do_main()
 

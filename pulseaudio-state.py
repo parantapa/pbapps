@@ -9,9 +9,10 @@ from __future__ import division, print_function, unicode_literals
 __author__ = "Parantapa Bhattachara <pb [at] parantapa [dot] net>"
 
 import time
+import signal
 import subprocess as sub
 
-from pbapps_common import do_main
+from pbapps_common import do_main, dummy_handler
 
 MODULE = "pulseaudio-state"
 
@@ -73,9 +74,10 @@ def get_sound_pulseaudio():
 def blocks_iter():
     while True:
         yield get_sound_pulseaudio()
-        time.sleep(1)
+        time.sleep(5)
 
 def main():
+    signal.signal(signal.SIGUSR1, dummy_handler)
     do_main(MODULE, 95, blocks_iter())
 
 if __name__ == '__main__':

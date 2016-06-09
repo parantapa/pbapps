@@ -10,4 +10,6 @@ source "$HOME/.bashrc"
 export UID
 
 script="$1"
-exec python "${srcdir}/${script}.py"
+shift
+
+exec python "${srcdir}/${script}.py" "$@"

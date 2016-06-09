@@ -10,6 +10,7 @@ from __future__ import division, print_function
 __author__ = "Parantapa Bhattachara <pb [at] parantapa [dot] net>"
 
 import os
+import sys
 import signal
 from subprocess import Popen, PIPE
 
@@ -20,7 +21,7 @@ from pbapps_common import get_i3status_rundir, get_logdir
 
 log = logbook.Logger("i3status-signal")
 
-def do_main():
+def do_main(service, signame):
     """
     Send the signal to the process.
     """
@@ -37,10 +38,11 @@ def do_main():
         return
 
     # Select the service name
-    cmd = ["dmenu-wrap"]
-    proc = Popen(cmd, stdin=PIPE, stdout=PIPE)
-    service, _ = proc.communicate("\n".join(sorted(service_pids)))
-    service = service.strip()
+    if service is None:
+        cmd = ["dmenu-wrap"]
+        proc = Popen(cmd, stdin=PIPE, stdout=PIPE)
+        service, _ = proc.communicate("\n".join(sorted(service_pids)))
+        service = service.strip()
     log.info("Selected service: {}", service)
 
     # Signal list
@@ -53,11 +55,12 @@ def do_main():
     }
 
     # Select the signal to send
-    cmd = ["dmenu-wrap"]
-    proc = Popen(cmd, stdin=PIPE, stdout=PIPE)
-    signame, _ = proc.communicate("\n".join(signame_signum))
-    signame = signame.strip()
-    log.info("Selected signam: {}", signal)
+    if signame is None:
+        cmd = ["dmenu-wrap"]
+        proc = Popen(cmd, stdin=PIPE, stdout=PIPE)
+        signame, _ = proc.communicate("\n".join(signame_signum))
+        signame = signame.strip()
+    log.info("Selected signame: {}", signame)
 
     # If we dont select any signal then exit.
     if signame == "-":
@@ -77,7 +80,12 @@ def main():
     logbook.FileHandler(logfile).push_application()
 
     with log.catch_exceptions():
-        do_main()
+        if len(sys.argv) == 1:
+            do_main(None, None)
+        elif len(sys.argv) == 3:
+            do_main(sys.argv[1], sys.argv[2])
+        else:
+            log.info("Invalid args: {}", sys.argv)
 
 if __name__ == '__main__':
     main()

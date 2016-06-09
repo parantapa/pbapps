@@ -5,6 +5,7 @@ Common code required by most app scripts.
 
 import os
 import json
+import signal
 
 import logbook
 import pypb.awriter as aw
@@ -48,6 +49,23 @@ def get_logdir():
 
     return _get_system_dir("/var/tmp/pbapps/log")
 
+def wake_i3status():
+    """
+    Wake up the i3status program.
+    """
+
+    pidfile = get_rundir() + "/i3status.pid"
+    try:
+        # Get the pid
+        with open(pidfile, "r") as fobj:
+            pid = fobj.read().strip()
+        pid = int(pid)
+
+        # Send SIGUSR1
+        os.kill(pid, signal.SIGUSR1)
+    except (OSError, IOError, ValueError):
+        pass
+
 def dummy_handler(signum, frame): # pylint: disable=unused-argument
     """
     Pass; do nothing
@@ -82,3 +100,4 @@ def do_main(modname, prio, iterable):
             for blocks in iterable:
                 with aw.open(blockfile, "w") as fobj:
                     json.dump(blocks, fobj)
+                wake_i3status()
