@@ -46,18 +46,20 @@ def get_cpuusage():
 
     usages = psutil.cpu_percent(None, True)
 
-    objs = []
-    for i, usage in enumerate(usages, 1):
-        usage = min(99.0, usage)
+    avg_usage = sum(usages) / len(usages)
 
-        objs.append({
-            "name": "cpu_usage",
-            "instance": i,
-            "full_text": "{} {} {:2.0f}%".format(SYMB_CPU, i, usage),
-            "color":  C_RED if usage >= 80 else C_GREEN
-        })
+    color = C_RED if avg_usage >= 80 else C_GREEN
 
-    return objs
+    usages = [min(99.0, u) for u in usages]
+    usages = ["{:2.0f}%".format(u) for u in usages]
+    usages = " ".join(usages)
+
+    return [{
+        "name": "cpu_usage",
+        "instance": 0,
+        "full_text": "{} {}".format(SYMB_CPU, usages),
+        "color":  color
+    }]
 
 def get_memusage():
     """
