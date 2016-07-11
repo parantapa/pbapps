@@ -9,6 +9,7 @@ from __future__ import division, print_function, unicode_literals
 __author__ = "Parantapa Bhattachara <pb [at] parantapa [dot] net>"
 
 import os
+from os.path import join, dirname, abspath
 import time
 import json
 from subprocess import Popen, PIPE
@@ -22,6 +23,16 @@ from pbapps_common import get_i3status_rundir, wake_i3status
 C_WHITE = "#f8f8f2"
 
 SYMB_CLOCK = "\uf017"
+
+PING_FILE = join(dirname(abspath(__file__)), "ping.wav")
+
+def sound_ping():
+    """
+    Make pinging sound.
+    """
+
+    cmd = ["aplay", PING_FILE]
+    Popen(cmd).wait()
 
 def parse_period(text):
     """
@@ -152,6 +163,7 @@ def main():
         now = arrow.now().timestamp
 
     show_notificaiton("critical", 0, "Time up", "%s finished" % name)
+    sound_ping()
 
 if __name__ == '__main__':
     main()
