@@ -34,7 +34,7 @@ def get_xscreensaver_status(devnull):
         color = C_RED
 
     return [{
-        "name": "xscreensaver-status",
+        "name": MODULE,
         "full_text": SYMB_XSCREENSAVER,
         "color": color
         }]

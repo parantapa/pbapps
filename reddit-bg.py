@@ -27,10 +27,9 @@ from pypb import abspath
 import pypb.awriter as aw
 from pypb import register_exit_signals
 
-from pbapps_common import get_i3status_rundir, \
-                          get_logdir, \
-                          dummy_handler, \
-                          wake_i3status
+from pbapps_common import get_i3status_rundir, get_logdir, \
+                          dummy_handler, wake_i3status, \
+                          AttrDict
 
 MODULE = "reddit-bg"
 
@@ -42,11 +41,6 @@ SYMB_GET_IMG_LIST = "\uf021"
 SYMB_DOWNLOAD_IMG = "\uf019"
 
 log = logbook.Logger(MODULE)
-
-class AttrDict(dict):
-    def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
 
 def _req_get(*args, **kwargs):
     """
@@ -300,7 +294,6 @@ def set_background(screen, mode, cfg, statefile):
         json.dump(sorted(seen_urls), fobj)
 
 def read_cfg(fname):
-    # pylint: disable=attribute-defined-outside-init,no-member
     """
     Read the config.
     """
@@ -316,7 +309,6 @@ def read_cfg(fname):
     return cfg
 
 def do_main(statefile):
-    # pylint: disable=no-member
     """
     Run the actual code.
     """
