@@ -22,7 +22,11 @@ class AttrDict(dict):
 
 ICONS = AttrDict({
     "fa_coffee": u"\uf0f4",
-    "fa_graduation_cap": u"\uf19d"
+    "fa_graduation_cap": u"\uf19d",
+    "fa_bed": u"\uf236",
+    "fa_hdd_o": u"\uf0a0",
+    "fa_scissors": u"\uf0c4",
+    "fa_spinner": u"\uf110"
 })
 
 COLORS = AttrDict({
