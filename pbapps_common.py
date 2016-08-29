@@ -141,7 +141,7 @@ def fmt_period(period):
 
     if dd:
         fmt = "{} day{}, {}:{:02d}:{:02d}".format
-        return fmt(dd, (dd, "s" if dd > 1 else ""), hh, mm, ss)
+        return fmt(dd, ("s" if dd > 1 else ""), hh, mm, ss)
     elif hh:
         fmt = "{}:{:02d}:{:02d}".format
         return fmt(hh, mm, ss)
