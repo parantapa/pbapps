@@ -16,11 +16,8 @@ import pypb.awriter as aw
 from pypb.dmn_misc import dmn_pid
 from pbapps_common import get_i3status_rundir, wake_i3status, \
                           parse_period, fmt_period, sound_ping,\
-                          show_notificaiton, show_entry_dialog \
-
-C_WHITE = "#f8f8f2"
-
-SYMB_CLOCK = "\uf017"
+                          show_notificaiton, show_entry_dialog, \
+                          COLORS, ICONS
 
 def normalize_name(text):
     return "".join(c for c in text.lower() if c.isalnum())
@@ -59,13 +56,13 @@ def main():
     end = now + period
     while now < end:
         full_text = "{} {}: {}".format
-        full_text = full_text(SYMB_CLOCK, name, fmt_period(end - now))
+        full_text = full_text(ICONS.fa_clock_o, name, fmt_period(end - now))
 
         with aw.open(blockfile, "w") as fobj:
             fobj.write(json.dumps({
                 "name": "cname",
                 "full_text": full_text,
-                "color": C_WHITE
+                "color": COLORS.white
             }))
         wake_i3status()
 

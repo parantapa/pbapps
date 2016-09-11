@@ -12,16 +12,9 @@ import time
 import signal
 import subprocess as sub
 
-from pbapps_common import do_main, dummy_handler
+from pbapps_common import do_main, dummy_handler, ICONS, COLORS
 
 MODULE = "pulseaudio-state"
-
-C_GREY = "#7e8e91"
-C_WHITE = "#f8f8f2"
-C_RED = "#f92672"
-
-SYMB_SOUND_ON = "\uf028"
-SYMB_SOUND_OFF = "\uf026"
 
 def get_sound_pulseaudio():
     """
@@ -37,8 +30,8 @@ def get_sound_pulseaudio():
         return [{
             "name": "volume",
             "instance": "pulseaudio",
-            "full_text": "{}: ??%".format(SYMB_SOUND_ON),
-            "color": C_RED
+            "full_text": "{}: ??%".format(ICONS.fa_volume_up),
+            "color": COLORS.red
         }]
 
     sinks = sinks.strip()
@@ -58,11 +51,11 @@ def get_sound_pulseaudio():
     vol = int(vol)
 
     if mute or vol < 1:
-        symb = SYMB_SOUND_OFF
-        color = C_GREY
+        symb = ICONS.fa_volume_off
+        color = COLORS.grey
     else:
-        symb = SYMB_SOUND_ON
-        color = C_WHITE
+        symb = ICONS.fa_volume_up
+        color = COLORS.white
 
     return [{
         "name": "volume",

@@ -13,17 +13,12 @@ from datetime import datetime
 
 import psutil
 
-from pbapps_common import do_main
+from pbapps_common import do_main, COLORS, ICONS
 
 MODULE = "sys-state"
 
-C_GREY = "#7e8e91"
-C_WHITE = "#f8f8f2"
-C_RED = "#f92672"
-C_GREEN = "#a6e22e"
-
-SYMB_MEMORY = "\uf1c0"
-SYMB_CPU = "\uf108"
+SYMB_MEMORY = ICONS.fa_memory
+SYMB_CPU = ICONS.fa_cpu
 
 def get_date():
     """
@@ -48,7 +43,7 @@ def get_cpuusage():
 
     avg_usage = sum(usages) / len(usages)
 
-    color = C_RED if avg_usage >= 80 else C_GREEN
+    color = COLORS.red if avg_usage >= 80 else COLORS.green
 
     usages = [min(99.0, u) for u in usages]
     usages = ["{:2.0f}%".format(u) for u in usages]
@@ -73,7 +68,7 @@ def get_memusage():
         "name": "mem_usage",
         "instance": 0,
         "full_text": "{} {:2.0f}%".format(SYMB_MEMORY, usage),
-        "color": C_GREEN if usage < 80 else C_RED
+        "color": COLORS.green if usage < 80 else COLORS.red
     }]
 
 def blocks_iter():

@@ -75,7 +75,7 @@ def blocks_iter():
             color = COLORS.orange
         else:
             icon = STUDY_ICON
-            color = COLORS.magenta
+            color = COLORS.cyan
 
         runtime = time.time() - CUR_MODE_START
         runtime = fmt_period(runtime)

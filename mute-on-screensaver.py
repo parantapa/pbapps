@@ -14,13 +14,9 @@ import logbook
 
 import pypb.awriter as aw
 from pypb import register_exit_signals
-from pbapps_common import get_i3status_rundir, \
-                          get_logdir, \
-                          wake_i3status
-
-
-SYMB_MUTE_ON_SCREENSAVER = "\uf026 \uf00d"
-C_ORANGE = "#fd971f"
+from pbapps_common import get_i3status_rundir, get_logdir, \
+                          wake_i3status, \
+                          ICONS, COLORS
 
 MODULE = "mute-on-screensaver"
 
@@ -68,8 +64,8 @@ def main():
         with aw.open(blockfile, "w") as fobj:
             fobj.write(json.dumps({
                 "name": "mute_on_screensaver",
-                "full_text": SYMB_MUTE_ON_SCREENSAVER,
-                "color": C_ORANGE
+                "full_text": "%s %s" % (ICONS.fa_times, ICONS.fa_volume_off),
+                "color": COLORS.green
             }))
         wake_i3status()
 

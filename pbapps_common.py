@@ -25,8 +25,19 @@ ICONS = AttrDict({
     "fa_graduation_cap": u"\uf19d",
     "fa_bed": u"\uf236",
     "fa_hdd_o": u"\uf0a0",
+    "fa_floppy_o": u"\uf0c7",
     "fa_scissors": u"\uf0c4",
-    "fa_spinner": u"\uf110"
+    "fa_spinner": u"\uf110",
+    "fa_clock_o": u"\uf017",
+    "fa_volume_off": u"\uf026",
+    "fa_volume_up": u"\uf028",
+    "fa_times": u"\uf00d",
+    "fa_reddit": u"\uf1a1",
+    "fa_refresh": u"\uf021",
+    "fa_download": u"\uf019",
+    "fa_warn": u"\uf071",
+    "fa_memory": u"\uf1c0",
+    "fa_cpu": u"\uf108",
 })
 
 COLORS = AttrDict({

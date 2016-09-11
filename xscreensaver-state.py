@@ -11,14 +11,9 @@ __author__ = "Parantapa Bhattachara <pb [at] parantapa [dot] net>"
 import time
 import subprocess as sub
 
-from pbapps_common import do_main
+from pbapps_common import do_main, COLORS, ICONS
 
 MODULE = "xscreensaver-state"
-
-C_GREEN = "#a6e22e"
-C_RED = "#f92672"
-
-SYMB_XSCREENSAVER = "\uf00d"
 
 def get_xscreensaver_status(devnull):
     """
@@ -29,13 +24,13 @@ def get_xscreensaver_status(devnull):
         cmd = ["xscreensaver-command", "-version"]
         sub.check_call(cmd, stdout=devnull, stderr=devnull)
 
-        color = C_GREEN
+        color = COLORS.green
     except sub.CalledProcessError:
-        color = C_RED
+        color = COLORS.red
 
     return [{
         "name": MODULE,
-        "full_text": SYMB_XSCREENSAVER,
+        "full_text": ICONS.fa_times,
         "color": color
         }]
 

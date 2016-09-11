@@ -29,16 +29,16 @@ from pypb import register_exit_signals
 
 from pbapps_common import get_i3status_rundir, get_logdir, \
                           dummy_handler, wake_i3status, \
-                          AttrDict
+                          AttrDict, ICONS, COLORS
 
 MODULE = "reddit-bg"
 
 IMAGE_EXTS = "jpg JPG jpeg JPEG png PNG".split()
 
-SYMB_REDDIT = "\uf1a1"
-SYMB_SLEEPING = "\uf236"
-SYMB_GET_IMG_LIST = "\uf021"
-SYMB_DOWNLOAD_IMG = "\uf019"
+SYMB_REDDIT = ICONS.fa_reddit
+SYMB_SLEEPING = ICONS.fa_bed
+SYMB_GET_IMG_LIST = ICONS.fa_refresh
+SYMB_DOWNLOAD_IMG = ICONS.fa_download
 
 log = logbook.Logger(MODULE)
 
@@ -63,7 +63,7 @@ def state_update(text, fname):
 
     block = [{
         "full_text": "{}: {}".format(SYMB_REDDIT, text),
-        "color": "#66d9ef"
+        "color": COLORS.green
     }]
 
     with aw.open(fname, "w") as fobj:
