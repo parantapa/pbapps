@@ -96,7 +96,7 @@ def backup_iter():
         log.info("Backup completed with: {}\n{}", retcode, stdout)
 
         log.info("Sleeping for {} mins ...", SLEEP_TIME)
-        yield [{"name": MODULE, "full_text": SYMB_SAVE, "color": COLORS.green}]
+        yield [{"name": MODULE, "full_text": SYMB_SLEEP, "color": COLORS.green}]
         time.sleep(SLEEP_TIME * 60)
 
 def main():

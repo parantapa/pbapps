@@ -28,15 +28,19 @@ def do_main():
     cmd = ["xscreensaver-command", "-watch"]
     proc = Popen(cmd, stdout=PIPE, stderr=STDOUT)
 
-    # NOTE: As of today (July 20, 2015) we can't use
-    # ``for line in proc.stdout'' here because of the following bug
-    # http://bugs.python.org/issue3907
-    for line in iter(proc.stdout.readline, ""):
-        line = line.strip()
+    try:
+        # NOTE: As of today (July 20, 2015) we can't use
+        # ``for line in proc.stdout'' here because of the following bug
+        # http://bugs.python.org/issue3907
+        for line in iter(proc.stdout.readline, ""):
+            line = line.strip()
 
-        if line.startswith("BLANK") or line.startswith("LOCK"):
-            cmd = ["sound-ctrl", "mute"]
-            Popen(cmd).wait()
+            if line.startswith("BLANK") or line.startswith("LOCK"):
+                cmd = ["sound-ctrl", "mute"]
+                Popen(cmd).wait()
+    except (SystemExit, KeyboardInterrupt):
+        proc.terminate()
+        raise
 
 def main():
     prio = 70
