@@ -30,7 +30,7 @@ def get_sound_pulseaudio():
         return [{
             "name": "volume",
             "instance": "pulseaudio",
-            "full_text": "{}: ??%".format(ICONS.fa_volume_up),
+            "full_text": "{}: ??%".format(ICONS.fa_volume_off),
             "color": COLORS.red
         }]
 
@@ -52,7 +52,7 @@ def get_sound_pulseaudio():
 
     if mute or vol < 1:
         symb = ICONS.fa_volume_off
-        color = COLORS.grey
+        color = COLORS.black
     else:
         symb = ICONS.fa_volume_up
         color = COLORS.white
